@@ -44,6 +44,14 @@
             background: #4752C4;
         }
 
+        .logout-btn {
+            background: #ff4e4e !important;
+        }
+
+        .logout-btn:hover {
+            background: #d93c3c !important;
+        }
+
         .profile-box {
             background: #1D1D1D;
             padding: 20px;
@@ -57,54 +65,50 @@
     <h1 class="title">🔥 BGB Web Game</h1>
     <p class="subtitle">디스코드 경험치 + 웹게임 전투 시스템</p>
 
-    <div class="profile-box">
+    <div class="profile-box" id="profileBox">
         <p>🔑 아직 로그인하지 않았습니다</p>
         <a class="btn" href="https://message-tracker-1.onrender.com/login">🔑 Discord 로그인</a>
     </div>
 
     <div class="menu">
-        <a class="btn" href="#">⚔ 공격하기</a>
-        <a class="btn" href="#">🗡 스킬 사용</a>
-        <a class="btn" href="#">👹 보스 공격</a>
-        <a class="btn" href="#">⚒ 무기 강화</a>
-        <a class="btn" href="#">🎒 인벤토리</a>
-        <a class="btn" href="#">📅 출석하기</a>
+        <button class="btn" onclick="attack()">⚔ 공격하기</button>
+        <button class="btn" onclick="skill()">🗡 스킬 사용</button>
+        <button class="btn" onclick="boss()">👹 보스 공격</button>
+        <button class="btn" onclick="enhance()">⚒ 무기 강화</button>
+        <button class="btn" onclick="inventory()">🎒 인벤토리</button>
+        <button class="btn" onclick="checkIn()">📅 출석하기</button>
     </div>
 
 <script>
-    const url = new URL(window.location.href);
-    const user_id = url.searchParams.get("id");
-    const username = url.searchParams.get("name");
-    const avatar = url.searchParams.get("avatar");
+// URL로부터 로그인 후 전달된 데이터 가져오기
+const url = new URL(window.location.href);
+const user_id = url.searchParams.get("id");
+const username = url.searchParams.get("name");
+const avatar = url.searchParams.get("avatar");
 
-    // 로그인 성공 시 → localStorage에 저장
-    if (user_id) {
-        localStorage.setItem("user_id", user_id);
-        localStorage.setItem("username", username);
-        localStorage.setItem("avatar", avatar);
+// 로그인 성공 시 localStorage 저장
+if (user_id) {
+    localStorage.setItem("user_id", user_id);
+    localStorage.setItem("username", username);
+    localStorage.setItem("avatar", avatar);
 
-        // URL 깔끔하게 리다이렉트 (파라미터 제거)
-        history.replaceState({}, "", "/BGBWebGame/");
-    }
+    // URL 정리
+    history.replaceState({}, "", "/BGBWebGame/");
+}
 
-    // 로그인 상태 표시
-    const box = document.querySelector(".profile-box");
+// 로그아웃 기능
+function logout() {
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("username");
+    localStorage.removeItem("avatar");
 
-    const savedID = localStorage.getItem("user_id");
-    const savedName = localStorage.getItem("username");
-    const savedAvatar = localStorage.getItem("avatar");
-
-    if (savedID && box) {
-        box.innerHTML = `
-            <p>👤 로그인됨: <b>${savedName}</b></p>
-            <img src="https://cdn.discordapp.com/avatars/${savedID}/${savedAvatar}.png" 
-                style="width:80px; border-radius:50%; margin-top:10px;">
-            <p style="margin-top:10px;">ID: ${savedID}</p>
-        `;
-    }
+    // 화면 새로고침하여 로그인 화면으로 돌아가기
+    location.reload();
+}
 </script>
-    
+
 <script>
+// Google Sheets에서 유저 정보 불러오기
 async function loadUserInfo() {
     const id = localStorage.getItem("user_id");
     if (!id) return;
@@ -114,23 +118,41 @@ async function loadUserInfo() {
 
     if (data.error) return;
 
-    // HTML에 표시
-    document.querySelector(".profile-box").innerHTML = `
+    // HTML UI 구성
+    document.getElementById("profileBox").innerHTML = `
         <p>👤 ${localStorage.getItem("username")} 님</p>
         <img src="https://cdn.discordapp.com/avatars/${id}/${localStorage.getItem("avatar")}.png"
              style="width:80px;border-radius:50%;margin-top:10px;">
         <p>🏅 직업: ${data.job}</p>
         <p>📈 레벨: ${data.level}</p>
         <p>✨ 경험치: ${data.exp} / ${data.next_exp}</p>
+
+        <button class="btn logout-btn" onclick="logout()">🚪 로그아웃</button>
     `;
 }
 
-// 로그인 이후 유저 정보 표시
 loadUserInfo();
 </script>
 
+<script>
+// 출석하기 버튼 동작
+async function checkIn() {
+    const id = localStorage.getItem("user_id");
+    if (!id) return alert("로그인이 필요합니다.");
 
+    const res = await fetch(`https://message-tracker-1.onrender.com/api/checkin?user_id=${id}`);
+    const data = await res.json();
 
-    
+    alert(data.message);
+}
+
+// 다른 기능은 추후 구현
+function attack(){ alert("아직 구현 안됨"); }
+function skill(){ alert("아직 구현 안됨"); }
+function boss(){ alert("아직 구현 안됨"); }
+function enhance(){ alert("아직 구현 안됨"); }
+function inventory(){ alert("아직 구현 안됨"); }
+</script>
+
 </body>
 </html>
