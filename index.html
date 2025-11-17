@@ -71,5 +71,37 @@
         <a class="btn" href="#">📅 출석하기</a>
     </div>
 
+<script>
+    const url = new URL(window.location.href);
+    const user_id = url.searchParams.get("id");
+    const username = url.searchParams.get("name");
+    const avatar = url.searchParams.get("avatar");
+
+    // 로그인 성공 시 → localStorage에 저장
+    if (user_id) {
+        localStorage.setItem("user_id", user_id);
+        localStorage.setItem("username", username);
+        localStorage.setItem("avatar", avatar);
+
+        // URL 깔끔하게 리다이렉트 (파라미터 제거)
+        history.replaceState({}, "", "/BGBWebGame/");
+    }
+
+    // 로그인 상태 표시
+    const box = document.querySelector(".profile-box");
+
+    const savedID = localStorage.getItem("user_id");
+    const savedName = localStorage.getItem("username");
+    const savedAvatar = localStorage.getItem("avatar");
+
+    if (savedID && box) {
+        box.innerHTML = `
+            <p>👤 로그인됨: <b>${savedName}</b></p>
+            <img src="https://cdn.discordapp.com/avatars/${savedID}/${savedAvatar}.png" 
+                style="width:80px; border-radius:50%; margin-top:10px;">
+            <p style="margin-top:10px;">ID: ${savedID}</p>
+        `;
+    }
+</script>
 </body>
 </html>
