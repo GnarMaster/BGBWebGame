@@ -103,5 +103,34 @@
         `;
     }
 </script>
+    
+<script>
+async function loadUserInfo() {
+    const id = localStorage.getItem("user_id");
+    if (!id) return;
+
+    const res = await fetch(`https://message-tracker-1.onrender.com/api/userinfo?user_id=${id}`);
+    const data = await res.json();
+
+    if (data.error) return;
+
+    // HTML에 표시
+    document.querySelector(".profile-box").innerHTML = `
+        <p>👤 ${localStorage.getItem("username")} 님</p>
+        <img src="https://cdn.discordapp.com/avatars/${id}/${localStorage.getItem("avatar")}.png"
+             style="width:80px;border-radius:50%;margin-top:10px;">
+        <p>🏅 직업: ${data.job}</p>
+        <p>📈 레벨: ${data.level}</p>
+        <p>✨ 경험치: ${data.exp} / ${data.next_exp}</p>
+    `;
+}
+
+// 로그인 이후 유저 정보 표시
+loadUserInfo();
+</script>
+
+
+
+    
 </body>
 </html>
